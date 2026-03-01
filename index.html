@@ -1173,7 +1173,7 @@ function App() {
         // Simulate a plausible settlement ref
         settleRes = {
           simulated: true,
-          settlement_ref: 'solana_' + randomHex(16),
+          settlement_ref: 'SIMULATED_NO_REAL_TX',
           tx_hash: randomHex(32),
           status: 'submitted',
         };
@@ -1210,7 +1210,7 @@ function App() {
         };
       }
 
-      const explorerUrl = `https://explorer.solana.com/address/${settlementRef}?cluster=devnet`;
+      const explorerUrl = `https://explorer.solana.com/tx/${settlementRef}?cluster=devnet`;
       const ts4 = new Date();
 
       setStepData(prev => ({...prev, 4: {
