@@ -878,7 +878,7 @@ function truncAddr(addr) {
 // Constants
 // ─────────────────────────────────────────────
 
-const API_BASE   = 'http://privchain-dev-api-alb-1882000527.us-east-1.elb.amazonaws.com';
+const API_BASE   = 'https://api.privchain.io';
 const API_KEY    = 'privchain-demo-hackathon-2026';
 const BUYER_ADDR = 'CEmG1JtpBfPLJqS7HksHVZ5wGsKp2xLKvcyXsaL1d2wE';
 const SELLER_ADDR = 'BGzpdCEXXLMv4CaxGoRmxniABGMJoRVLcL8xEcigiPy3';
@@ -1091,14 +1091,17 @@ function App() {
 
       // ── Step 1: POST /verify ──
       setCurrentStep(1);
+      const expiry = Math.floor(Date.now() / 1000) + 3600;
       const verifyPayload = {
+        scheme: 'priv-stark/v1',
+        network: 'solana-devnet',
         nullifier,
         proof,
         commitment,
-        amount: AMOUNT,
+        amount: String(AMOUNT),
         recipient: SELLER_ADDR,
-        sender: BUYER_ADDR,
-        protocol: 'priv-stark/v1',
+        protocol_version: 'priv-stark/v1',
+        expiry,
       };
 
       let verifyRes = null, verifyRaw = null;
@@ -1107,7 +1110,7 @@ function App() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Api-Key': API_KEY,
+            'Authorization': `Bearer ${API_KEY}`,
           },
           body: JSON.stringify(verifyPayload),
           signal: AbortSignal.timeout(10000),
@@ -1142,13 +1145,15 @@ function App() {
       // ── Step 3: POST /settle ──
       setCurrentStep(3);
       const settlePayload = {
+        scheme: 'priv-stark/v1',
+        network: 'solana-devnet',
         nullifier,
         proof,
         commitment,
-        amount: AMOUNT,
+        amount: String(AMOUNT),
         recipient: SELLER_ADDR,
-        sender: BUYER_ADDR,
-        protocol: 'priv-stark/v1',
+        protocol_version: 'priv-stark/v1',
+        expiry,
       };
 
       let settleRes = null;
@@ -1157,7 +1162,7 @@ function App() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Api-Key': API_KEY,
+            'Authorization': `Bearer ${API_KEY}`,
           },
           body: JSON.stringify(settlePayload),
           signal: AbortSignal.timeout(10000),
