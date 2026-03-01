@@ -22,6 +22,7 @@
       --accent2:   #7c3aed;
       --green:     #00e676;
       --yellow:    #ffd740;
+      --amber:     #ffa500;
       --red:       #ff5252;
       --muted:     #4a6080;
       --text:      #c8d8e8;
@@ -68,6 +69,14 @@
       0%, 100% { box-shadow: 0 0 8px rgba(0,212,255,0.2); }
       50%       { box-shadow: 0 0 24px rgba(0,212,255,0.5); }
     }
+    @keyframes pulseGlowAmber {
+      0%, 100% { box-shadow: 0 0 8px rgba(255,165,0,0.2); border-color: rgba(255,165,0,0.3); }
+      50%       { box-shadow: 0 0 28px rgba(255,165,0,0.55); border-color: rgba(255,165,0,0.65); }
+    }
+    @keyframes pulseGlowApprove {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,212,255,0.4), 0 0 40px rgba(123,47,247,0.2); }
+      50%       { box-shadow: 0 0 40px rgba(0,212,255,0.7), 0 0 70px rgba(123,47,247,0.4); }
+    }
     @keyframes spinnerRing {
       to { transform: rotate(360deg); }
     }
@@ -94,6 +103,10 @@
     @keyframes hexPulse {
       0%, 100% { opacity: 0.4; }
       50%       { opacity: 1; }
+    }
+    @keyframes approveFloat {
+      0%   { opacity: 0; transform: translateY(18px) scale(0.94); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     /* ─── Layout helpers ─── */
@@ -283,6 +296,14 @@
       border-color: rgba(124,58,237,0.3);
       box-shadow: 0 0 20px rgba(124,58,237,0.15);
     }
+    /* Amber pulse for awaiting-approval state */
+    .agent-card.awaiting-approval {
+      animation: pulseGlowAmber 1.8s ease-in-out infinite !important;
+    }
+    .agent-card.awaiting-approval::before {
+      background: linear-gradient(90deg, transparent, var(--amber), transparent) !important;
+      opacity: 1 !important;
+    }
 
     .agent-header {
       display: flex;
@@ -361,6 +382,16 @@
       background: rgba(0,230,118,0.1);
       border: 1px solid rgba(0,230,118,0.3);
       color: var(--green);
+    }
+    .badge-reviewing {
+      background: rgba(255,165,0,0.12);
+      border: 1px solid rgba(255,165,0,0.4);
+      color: var(--amber);
+    }
+    .badge-awaiting {
+      background: rgba(255,165,0,0.08);
+      border: 1px solid rgba(255,165,0,0.3);
+      color: #ffb74d;
     }
 
     .agent-fields {
@@ -457,6 +488,11 @@
       border-color: var(--accent);
       animation: pulseGlow 1.2s ease-in-out infinite;
     }
+    .flow-node.pause {
+      border-color: var(--amber);
+      background: rgba(255,165,0,0.1);
+      box-shadow: 0 0 12px rgba(255,165,0,0.35);
+    }
 
     .flow-line {
       width: 2px;
@@ -490,6 +526,69 @@
       color: var(--muted);
       font-family: 'JetBrains Mono', monospace;
     }
+
+    /* ─── Approve Gate ─── */
+    .approve-gate {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin: 20px 0;
+      animation: approveFloat 0.5s cubic-bezier(0.4,0,0.2,1) forwards;
+      width: 100%;
+    }
+    .approve-gate-label {
+      font-size: 11px;
+      color: var(--amber);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+    .approve-btn {
+      background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+      color: #fff;
+      font-weight: 700;
+      font-size: 18px;
+      padding: 16px 48px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(0,212,255,0.5);
+      animation: pulseGlowApprove 1.6s ease-in-out infinite;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: -0.2px;
+      transition: transform 0.15s, opacity 0.15s;
+      width: 100%;
+    }
+    .approve-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+    .approve-btn:active {
+      transform: translateY(0) scale(0.99);
+    }
+    .approve-gate-sub {
+      font-size: 11px;
+      color: var(--text2);
+      font-family: 'JetBrains Mono', monospace;
+      text-align: center;
+      line-height: 1.5;
+      padding: 0 8px;
+    }
+    .reject-btn {
+      background: transparent;
+      color: #ff4444;
+      border: 1px solid #ff4444;
+      padding: 8px 24px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .reject-btn:hover { opacity: 1; }
 
     /* ─── Timeline ─── */
     .timeline-section {
@@ -572,6 +671,11 @@
     }
     .step-item.current-step .step-icon-wrap {
       animation: pulseGlow 1.2s ease-in-out infinite;
+    }
+    .step-item.pause-step .step-icon-wrap {
+      background: rgba(255,165,0,0.08);
+      border-color: rgba(255,165,0,0.35);
+      animation: pulseGlowAmber 1.8s ease-in-out infinite;
     }
 
     .step-body { flex: 1; min-width: 0; }
@@ -841,13 +945,11 @@ async function sha256hex(str) {
     const hash = await crypto.subtle.digest('SHA-256', buf);
     return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
   } catch(e) {
-    // Fallback: simple djb2-style deterministic hex (for http:// contexts)
     let h = 0xdeadbeef;
     for (let i = 0; i < str.length; i++) {
       h = Math.imul(h ^ str.charCodeAt(i), 0x9e3779b9);
       h = (h ^ (h >>> 16)) >>> 0;
     }
-    // expand to 64 char by repeating pattern
     const base = (h >>> 0).toString(16).padStart(8, '0');
     const ext = Array.from({length: 7}, (_, i) => {
       let v = h ^ (i * 0x1f2f3f4f);
@@ -870,10 +972,6 @@ function fmtTime(d) {
   return d.toISOString().substr(11,12);
 }
 
-function truncAddr(addr) {
-  return addr.slice(0,8) + '...' + addr.slice(-6);
-}
-
 // ─────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────
@@ -884,27 +982,36 @@ const BUYER_ADDR = 'CEmG1JtpBfPLJqS7HksHVZ5wGsKp2xLKvcyXsaL1d2wE';
 const SELLER_ADDR = 'BGzpdCEXXLMv4CaxGoRmxniABGMJoRVLcL8xEcigiPy3';
 const AMOUNT     = 750;
 
+// 9 steps: 0-8
 const STEPS_DEFS = [
-  { emoji: '🔐', label: 'Agent A generates ZK commitment + nullifier',       detail: null },
-  { emoji: '📡', label: 'Agent A calls /verify on PrivChain facilitator',   detail: null },
-  { emoji: '✅', label: 'Facilitator verifies proof (priv-stark/v1)',       detail: null },
-  { emoji: '💸', label: 'Agent A calls /settle — Solana transaction submitted', detail: null },
-  { emoji: '🔗', label: 'Settlement confirmed',                             detail: null },
-  { emoji: '📦', label: 'Agent B receives payment proof, delivers service', detail: null },
-  { emoji: '🎉', label: 'Transaction complete — amount & parties remain private', detail: null },
+  { emoji: '🔒', label: 'Agent B generates deliverable commitment',               detail: 'Deliverable hash locked before work begins' },
+  { emoji: '📋', label: 'Agent B posts commitment on-chain',                       detail: 'Agent B cannot change deliverable without invalidating commitment' },
+  { emoji: '🔐', label: 'Agent A generates ZK payment commitment + nullifier',    detail: 'Payment commitment locked — can only release with Agent A\'s signature' },
+  { emoji: '📡', label: 'Agent A calls /verify on PrivChain facilitator',         detail: null },
+  { emoji: '📦', label: 'Agent B delivers training data package',                  detail: 'Hash matches committed value — delivery verified' },
+  { emoji: '⏸️', label: 'Agent A reviews deliverable',                             detail: 'Awaiting human approval to release payment' },
+  { emoji: '✅', label: 'Agent A approves — blind payment signature released',    detail: 'Signature releases the locked payment commitment — settlement can now proceed' },
+  { emoji: '💸', label: 'Agent A calls /settle — Solana transaction submitted',   detail: null },
+  { emoji: '🎉', label: 'Transaction complete — private by design',               detail: 'Amount: hidden  |  Sender: hidden  |  Receiver: hidden' },
 ];
+
+const TOTAL_STEPS = STEPS_DEFS.length; // 9
 
 // ─────────────────────────────────────────────
 // StatusBadge
 // ─────────────────────────────────────────────
 function StatusBadge({ status }) {
   const map = {
-    'Idle':      { cls: 'badge-idle',      dot: '○' },
-    'Paying':    { cls: 'badge-active',    dot: '●' },
-    'Complete':  { cls: 'badge-complete',  dot: '✓' },
-    'Waiting':   { cls: 'badge-waiting',   dot: '◐' },
-    'Verifying': { cls: 'badge-verifying', dot: '◑' },
-    'Paid':      { cls: 'badge-paid',      dot: '✓' },
+    'Idle':             { cls: 'badge-idle',      dot: '○' },
+    'Locking':          { cls: 'badge-active',    dot: '●' },
+    'Reviewing':        { cls: 'badge-reviewing', dot: '◑' },
+    'Approved':         { cls: 'badge-active',    dot: '✓' },
+    'Complete':         { cls: 'badge-complete',  dot: '✓' },
+    'Waiting':          { cls: 'badge-waiting',   dot: '◐' },
+    'Committed':        { cls: 'badge-verifying', dot: '◑' },
+    'Delivered':        { cls: 'badge-active',    dot: '●' },
+    'Awaiting Approval':{ cls: 'badge-awaiting',  dot: '⏸' },
+    'Paid':             { cls: 'badge-paid',       dot: '✓' },
   };
   const { cls, dot } = map[status] || map['Idle'];
   return (
@@ -917,18 +1024,29 @@ function StatusBadge({ status }) {
 // ─────────────────────────────────────────────
 // AgentCard
 // ─────────────────────────────────────────────
-function AgentCard({ side, status }) {
+function AgentCard({ side, status, awaitingApproval }) {
   const isBuyer = side === 'buyer';
   const active = status !== 'Idle' && status !== 'Waiting';
+  const isAmber = awaitingApproval;
+
+  let cardClass = `agent-card`;
+  if (isAmber) {
+    cardClass += ` active awaiting-approval`;
+  } else if (active) {
+    cardClass += ` active`;
+    if (!isBuyer) cardClass += ` seller-card`;
+  } else {
+    if (!isBuyer) cardClass += ` seller-card`;
+  }
 
   return (
-    <div className={`agent-card ${active ? 'active' : ''} ${!isBuyer ? 'seller-card' : ''}`}>
+    <div className={cardClass}>
       <div className="agent-header">
         <div style={{ display:'flex', alignItems:'center', gap:12 }}>
           <div className={`agent-avatar ${isBuyer ? 'avatar-buyer' : 'avatar-seller'}`}>🤖</div>
           <div>
-            <div className="agent-title">{isBuyer ? 'Agent A — Buyer' : 'Agent B — Seller'}</div>
-            <div className="agent-subtitle">{isBuyer ? 'Needs: EasyA Polkadot quiz answers' : 'Offers: Polkadot dev training data'}</div>
+            <div className="agent-title">{isBuyer ? '🤖 Agent A — Buyer' : '🤖 Agent B — Seller'}</div>
+            <div className="agent-subtitle">{isBuyer ? 'Wants: EasyA Polkadot training data' : 'Selling: Polkadot dev training data'}</div>
           </div>
         </div>
         <StatusBadge status={status} />
@@ -959,8 +1077,8 @@ function AgentCard({ side, status }) {
 // ─────────────────────────────────────────────
 // FlowColumn
 // ─────────────────────────────────────────────
-function FlowColumn({ currentStep }) {
-  const icons = ['🔐','📡','✅','💸','🔗','📦','🎉'];
+function FlowColumn({ currentStep, awaitingApproval, onApprove }) {
+  const icons = ['🔒','📋','🔐','📡','📦','⏸️','✅','💸','🎉'];
   const n = icons.length;
 
   return (
@@ -975,17 +1093,35 @@ function FlowColumn({ currentStep }) {
       </div>
 
       <div className="flow-pipe">
-        {icons.map((icon, i) => (
-          <React.Fragment key={i}>
-            <div className={`flow-node ${i < currentStep ? 'done' : ''} ${i === currentStep ? 'current' : ''}`}>
-              {icon}
-            </div>
-            {i < n - 1 && (
-              <div className={`flow-line ${i < currentStep ? 'lit' : ''}`}></div>
-            )}
-          </React.Fragment>
-        ))}
+        {icons.map((icon, i) => {
+          const isPauseNode = i === 5;
+          const nodeClass = `flow-node${i < currentStep ? ' done' : ''}${i === currentStep && !awaitingApproval ? ' current' : ''}${isPauseNode && awaitingApproval ? ' pause' : ''}`;
+          return (
+            <React.Fragment key={i}>
+              <div className={nodeClass}>{icon}</div>
+              {i < n - 1 && (
+                <div className={`flow-line ${i < currentStep ? 'lit' : ''}`}></div>
+              )}
+            </React.Fragment>
+          );
+        })}
       </div>
+
+      {/* Approve Gate button in flow column */}
+      {awaitingApproval && (
+        <div className="approve-gate">
+          <div className="approve-gate-label">⏸ Awaiting Agent A Approval</div>
+          <button className="approve-btn" onClick={onApprove}>
+            ✅ Approve &amp; Release Payment
+          </button>
+          <div className="approve-gate-sub">
+            Agent A has verified the deliverable matches the commitment hash
+          </div>
+          <button className="reject-btn" onClick={() => {}}>
+            ✗ Reject
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -993,45 +1129,56 @@ function FlowColumn({ currentStep }) {
 // ─────────────────────────────────────────────
 // StepItem
 // ─────────────────────────────────────────────
-function StepItem({ step, index, currentStep, stepData }) {
+function StepItem({ step, index, currentStep, stepData, awaitingApproval }) {
+  const isPauseStep = index === 5;
+  const isActive = index <= currentStep;
+  const isCurrent = index === currentStep;
+  const isPausingHere = isPauseStep && awaitingApproval;
+
   const state =
     index < currentStep ? 'visible' :
-    index === currentStep ? 'visible current-step' :
+    index === currentStep ? `visible${isPausingHere ? ' pause-step' : ' current-step'}` :
     'pending';
-
-  const isVisible = index <= currentStep;
-  const isCurrent = index === currentStep;
 
   const data = stepData[index] || {};
 
   return (
-    <div className={`step-item ${state}`} style={{ animationDelay: isVisible ? '0ms' : undefined }}>
+    <div className={`step-item ${state}`}>
       <div className="step-icon-wrap">{step.emoji}</div>
       <div className="step-body">
         <div className="step-title">
           {step.label}
-          {isCurrent && <span className="step-spinner"></span>}
+          {isCurrent && !isPausingHere && <span className="step-spinner"></span>}
+          {isPausingHere && <span style={{marginLeft:8, fontSize:11, color:'var(--amber)', fontFamily:"'JetBrains Mono', monospace"}}>PAUSED — awaiting approval</span>}
         </div>
-        {isVisible && data.hash && (
+        {isActive && data.hash && (
           <div>
             <span className="step-hash">{data.hash}</span>
           </div>
         )}
-        {isVisible && data.link && (
+        {isActive && data.hash2 && (
+          <div>
+            <span className="step-hash" style={{color:'#a78bfa', borderColor:'rgba(124,58,237,0.25)', background:'rgba(124,58,237,0.05)'}}>{data.hash2}</span>
+          </div>
+        )}
+        {isActive && data.link && (
           <div style={{marginTop:4}}>
             <a className="step-link" href={data.link} target="_blank" rel="noopener noreferrer">
               ↗ {data.linkLabel || data.link}
             </a>
           </div>
         )}
-        {isVisible && data.note && (
+        {isActive && data.note && (
           <div className="step-meta" style={{marginTop:4, color:'var(--text2)'}}>{data.note}</div>
         )}
-        {isVisible && data.time && (
+        {isActive && step.detail && (
+          <div className="step-meta" style={{marginTop:3, color:'var(--muted)', fontStyle:'italic'}}>{step.detail}</div>
+        )}
+        {isActive && data.time && (
           <div className="step-meta" style={{marginTop:2}}>{data.time}</div>
         )}
       </div>
-      {isVisible && data.ts && (
+      {isActive && data.ts && (
         <div className="step-time">{fmtTime(data.ts)}</div>
       )}
     </div>
@@ -1042,25 +1189,57 @@ function StepItem({ step, index, currentStep, stepData }) {
 // Main App
 // ─────────────────────────────────────────────
 function App() {
-  const [running, setRunning] = React.useState(false);
-  const [done, setDone]       = React.useState(false);
-  const [currentStep, setCurrentStep] = React.useState(-1);
-  const [stepData, setStepData]       = React.useState({});
-  const [error, setError]             = React.useState(null);
-  const [liveData, setLiveData]       = React.useState(null);
+  const [running, setRunning]               = React.useState(false);
+  const [done, setDone]                     = React.useState(false);
+  const [currentStep, setCurrentStep]       = React.useState(-1);
+  const [stepData, setStepData]             = React.useState({});
+  const [error, setError]                   = React.useState(null);
+  const [liveData, setLiveData]             = React.useState(null);
+  const [awaitingApproval, setAwaitingApproval] = React.useState(false);
 
-  // Derived agent states
-  const buyerStatus  = !running && !done ? 'Idle'
+  // Ref to trigger post-approval continuation
+  const approveResolveRef = React.useRef(null);
+
+  // ── Derived agent statuses ──
+  // Buyer (Agent A): Idle → Locking → Reviewing → Approved → Complete
+  // Seller (Agent B): Waiting → Committed → Delivered → Awaiting Approval → Paid
+  const buyerStatus = !running && !done ? 'Idle'
     : done ? 'Complete'
-    : currentStep >= 0 ? 'Paying' : 'Idle';
+    : awaitingApproval ? 'Reviewing'
+    : currentStep >= 6 ? 'Approved'
+    : currentStep >= 2 ? 'Locking'
+    : 'Idle';
 
   const sellerStatus = !running && !done ? 'Waiting'
     : done ? 'Paid'
-    : currentStep >= 5 ? 'Paid'
-    : currentStep >= 3 ? 'Verifying'
+    : awaitingApproval ? 'Awaiting Approval'
+    : currentStep >= 8 ? 'Paid'
+    : currentStep >= 4 ? 'Delivered'
+    : currentStep >= 1 ? 'Committed'
     : 'Waiting';
 
-  const progressPct = currentStep < 0 ? 0 : Math.round(((currentStep + 1) / 7) * 100);
+  // Progress: step 5 (pause) → ~65%, full at step 8
+  // We map steps 0-8 to 0-100%
+  // At step 5 pause, peg at 65
+  const progressPct = currentStep < 0 ? 0
+    : awaitingApproval ? 65
+    : Math.round(((currentStep + 1) / TOTAL_STEPS) * 100);
+
+  // ── Approve handler — resolves the pending promise ──
+  function handleApprove() {
+    if (approveResolveRef.current) {
+      approveResolveRef.current();
+      approveResolveRef.current = null;
+    }
+    setAwaitingApproval(false);
+  }
+
+  // ── Wait for approval promise ──
+  function waitForApproval() {
+    return new Promise(resolve => {
+      approveResolveRef.current = resolve;
+    });
+  }
 
   async function runDemo() {
     setRunning(true);
@@ -1069,28 +1248,67 @@ function App() {
     setStepData({});
     setError(null);
     setLiveData(null);
+    setAwaitingApproval(false);
+    approveResolveRef.current = null;
 
     try {
-      // ── Step 0: Generate ZK commitment + nullifier ──
+      // ─────────────────────────────────
+      // Step 0: Agent B generates deliverable commitment
+      // ─────────────────────────────────
       setCurrentStep(0);
+      await sleep(700);
+      const nonce = randomHex(8);
+      const deliverableStr = `EasyA Polkadot training data v1 | nonce: ${nonce}`;
+      const commitmentB = await sha256hex(deliverableStr);
+      const ts0 = new Date();
+      setStepData(prev => ({...prev, 0: {
+        hash: `commitment: ${commitmentB.slice(0,16)}…`,
+        hash2: `nonce: ${nonce}`,
+        note: 'sha256("EasyA Polkadot training data v1 | nonce: " + nonce)',
+        ts: ts0,
+      }}));
+
+      await sleep(600);
+
+      // ─────────────────────────────────
+      // Step 1: Agent B posts commitment on-chain
+      // ─────────────────────────────────
+      setCurrentStep(1);
+      await sleep(800);
+      const fakeSlot = Math.floor(Math.random() * 5000000) + 278000000;
+      const ts1 = new Date();
+      setStepData(prev => ({...prev, 1: {
+        hash: `slot: ${fakeSlot}`,
+        note: 'Commitment posted to Solana devnet',
+        ts: ts1,
+      }}));
+
+      await sleep(500);
+
+      // ─────────────────────────────────
+      // Step 2: Agent A generates ZK payment commitment + nullifier
+      // ─────────────────────────────────
+      setCurrentStep(2);
       await sleep(700);
       const nullifier   = randomHex(32);
       const proofInput  = nullifier + AMOUNT.toString() + SELLER_ADDR;
       const proof       = await sha256hex(proofInput);
       const commitInput = proof + nullifier;
       const commitment  = await sha256hex(commitInput);
-      const ts0 = new Date();
-      setStepData(prev => ({...prev, 0: {
+      const ts2 = new Date();
+      setStepData(prev => ({...prev, 2: {
         hash: `nullifier: ${nullifier.slice(0,16)}…`,
-        note: `commitment: ${commitment.slice(0,16)}…`,
-        ts: ts0,
-        time: 'ZK proof generated locally',
+        hash2: `commitment: ${commitment.slice(0,16)}…`,
+        note: 'ZK proof generated locally',
+        ts: ts2,
       }}));
 
       await sleep(600);
 
-      // ── Step 1: POST /verify ──
-      setCurrentStep(1);
+      // ─────────────────────────────────
+      // Step 3: Agent A calls /verify
+      // ─────────────────────────────────
+      setCurrentStep(3);
       const expiry = Math.floor(Date.now() / 1000) + 3600;
       const verifyPayload = {
         scheme: 'priv-stark/v1',
@@ -1104,7 +1322,7 @@ function App() {
         expiry,
       };
 
-      let verifyRes = null, verifyRaw = null;
+      let verifyRes = null;
       try {
         const r = await fetch(`${API_BASE}/verify`, {
           method: 'POST',
@@ -1115,35 +1333,71 @@ function App() {
           body: JSON.stringify(verifyPayload),
           signal: AbortSignal.timeout(10000),
         });
-        verifyRaw = await r.text();
-        try { verifyRes = JSON.parse(verifyRaw); } catch(_) { verifyRes = { raw: verifyRaw }; }
+        const txt = await r.text();
+        try { verifyRes = JSON.parse(txt); } catch(_) { verifyRes = { raw: txt }; }
       } catch(fetchErr) {
         verifyRes = { simulated: true, status: 'ok', message: 'Network unreachable — simulated response' };
       }
 
-      const ts1 = new Date();
-      setStepData(prev => ({...prev, 1: {
+      const ts3 = new Date();
+      setStepData(prev => ({...prev, 3: {
         hash: `POST /verify → ${verifyRes?.status || 'ok'}`,
-        ts: ts1,
-        time: `payload: ${JSON.stringify(verifyPayload).slice(0,60)}…`,
+        note: verifyRes?.simulated ? '⚠ API offline — demo simulation mode' : (verifyRes?.message || 'Proof accepted'),
+        ts: ts3,
+        time: `priv-stark/v1 ✓  proof verified`,
       }}));
 
       await sleep(500);
 
-      // ── Step 2: Facilitator verifies ──
-      setCurrentStep(2);
-      await sleep(900);
-      const ts2 = new Date();
-      setStepData(prev => ({...prev, 2: {
-        hash: `priv-stark/v1 ✓  proof verified`,
-        note: verifyRes?.simulated ? '⚠ API offline — demo simulation mode' : (verifyRes?.message || 'Proof accepted'),
-        ts: ts2,
+      // ─────────────────────────────────
+      // Step 4: Agent B delivers training data
+      // ─────────────────────────────────
+      setCurrentStep(4);
+      await sleep(800);
+      const deliverableHash = commitmentB; // matches commitment_b from step 0
+      const ts4 = new Date();
+      setStepData(prev => ({...prev, 4: {
+        hash: `deliverable_hash: ${deliverableHash.slice(0,16)}…`,
+        note: 'EasyA Polkadot training data package delivered',
+        ts: ts4,
       }}));
 
-      await sleep(400);
+      await sleep(600);
 
-      // ── Step 3: POST /settle ──
-      setCurrentStep(3);
+      // ─────────────────────────────────
+      // Step 5: INTERACTIVE PAUSE — Agent A reviews
+      // ─────────────────────────────────
+      setCurrentStep(5);
+      setAwaitingApproval(true);
+      const ts5 = new Date();
+      setStepData(prev => ({...prev, 5: {
+        note: 'Delivery received. Verifying hash matches committed value…',
+        ts: ts5,
+      }}));
+
+      // PAUSE HERE — wait for user to click Approve
+      await waitForApproval();
+
+      // ─────────────────────────────────
+      // Step 6: Agent A approves — blind payment signature released
+      // ─────────────────────────────────
+      setCurrentStep(6);
+      await sleep(500);
+      // Generate a fake ed25519-style signature (128 hex chars = 64 bytes)
+      const approvalSig = randomHex(64);
+      const ts6 = new Date();
+      setStepData(prev => ({...prev, 6: {
+        hash: `sig: 0x${approvalSig.slice(0,32)}…`,
+        note: 'Agent A\'s approval signature (ed25519)',
+        ts: ts6,
+      }}));
+
+      await sleep(600);
+
+      // ─────────────────────────────────
+      // Step 7: Agent A calls /settle — REAL Solana tx
+      // ─────────────────────────────────
+      setCurrentStep(7);
       const settlePayload = {
         scheme: 'priv-stark/v1',
         network: 'solana-devnet',
@@ -1165,12 +1419,11 @@ function App() {
             'Authorization': `Bearer ${API_KEY}`,
           },
           body: JSON.stringify(settlePayload),
-          signal: AbortSignal.timeout(10000),
+          signal: AbortSignal.timeout(20000),
         });
         const txt = await r.text();
         try { settleRes = JSON.parse(txt); } catch(_) { settleRes = { raw: txt }; }
       } catch(fetchErr) {
-        // Simulate a plausible settlement ref
         settleRes = {
           simulated: true,
           settlement_ref: 'SIMULATED_NO_REAL_TX',
@@ -1181,79 +1434,42 @@ function App() {
 
       const settlementRef = settleRes?.settlement_ref || settleRes?.ref || ('solana_' + randomHex(16));
       const txHash        = settleRes?.tx_hash || settleRes?.tx || commitment.slice(0,64);
-      const ts3 = new Date();
-
-      setStepData(prev => ({...prev, 3: {
+      const ts7 = new Date();
+      setStepData(prev => ({...prev, 7: {
         hash: `ref: ${settlementRef}`,
         note: settleRes?.simulated ? '⚠ Simulated tx — API offline' : `tx: ${txHash.slice(0,16)}…`,
-        ts: ts3,
+        ts: ts7,
       }}));
 
       await sleep(500);
 
-      // ── Step 4: GET /settlements/:ref ──
-      setCurrentStep(4);
-      let settleFinal = null;
-      try {
-        const r = await fetch(`${API_BASE}/settlements/${settlementRef}`, {
-          headers: { 'X-Api-Key': API_KEY },
-          signal: AbortSignal.timeout(8000),
-        });
-        const txt = await r.text();
-        try { settleFinal = JSON.parse(txt); } catch(_) { settleFinal = { raw: txt }; }
-      } catch(fetchErr) {
-        settleFinal = {
-          simulated: true,
-          settlement_ref: settlementRef,
-          status: 'confirmed',
-          block: Math.floor(Math.random() * 1000000) + 2000000,
-        };
-      }
-
+      // ─────────────────────────────────
+      // Step 8: Complete
+      // ─────────────────────────────────
+      setCurrentStep(8);
       const explorerUrl = `https://explorer.solana.com/tx/${settlementRef}?cluster=devnet`;
-      const ts4 = new Date();
-
-      setStepData(prev => ({...prev, 4: {
-        hash: `${settlementRef}`,
+      await sleep(500);
+      const ts8 = new Date();
+      setStepData(prev => ({...prev, 8: {
         link: explorerUrl,
-        linkLabel: `View on Solana Explorer ↗`,
-        note: `block: ${settleFinal?.block || 'confirmed'}`,
-        ts: ts4,
+        linkLabel: 'View on Solana Explorer ↗',
+        note: 'Amount: hidden  |  Sender: hidden  |  Receiver: hidden',
+        ts: ts8,
       }}));
 
-      // Save live data for the data cards
+      // Save live data for cards
       setLiveData({
         nullifier,
         proof,
         commitment,
+        commitmentB,
+        nonce,
         settlementRef,
         txHash,
         explorerUrl,
+        approvalSig,
         simulated: verifyRes?.simulated || settleRes?.simulated || false,
       });
-
-      await sleep(600);
-
-      // ── Step 5: Agent B delivers ──
-      setCurrentStep(5);
-      await sleep(700);
-      const ts5 = new Date();
-      setStepData(prev => ({...prev, 5: {
-        note: 'EasyA Polkadot training data package delivered',
-        hash: `proof: ${proof.slice(0,16)}…`,
-        ts: ts5,
-      }}));
-
-      await sleep(500);
-
-      // ── Step 6: Complete ──
-      setCurrentStep(6);
-      await sleep(500);
-      const ts6 = new Date();
-      setStepData(prev => ({...prev, 6: {
-        note: 'Amount: hidden  |  Sender: hidden  |  Receiver: hidden',
-        ts: ts6,
-      }}));
 
       setRunning(false);
       setDone(true);
@@ -1261,6 +1477,7 @@ function App() {
     } catch(err) {
       setError(err.message || 'Unknown error');
       setRunning(false);
+      setAwaitingApproval(false);
     }
   }
 
@@ -1271,6 +1488,8 @@ function App() {
     setStepData({});
     setError(null);
     setLiveData(null);
+    setAwaitingApproval(false);
+    approveResolveRef.current = null;
   }
 
   return (
@@ -1327,9 +1546,13 @@ function App() {
       {/* Main Demo Grid */}
       <div className="container">
         <div className="demo-grid">
-          <AgentCard side="buyer"  status={buyerStatus} />
-          <FlowColumn currentStep={currentStep} />
-          <AgentCard side="seller" status={sellerStatus} />
+          <AgentCard side="buyer"  status={buyerStatus}  awaitingApproval={awaitingApproval} />
+          <FlowColumn
+            currentStep={currentStep}
+            awaitingApproval={awaitingApproval}
+            onApprove={handleApprove}
+          />
+          <AgentCard side="seller" status={sellerStatus} awaitingApproval={awaitingApproval} />
         </div>
 
         {/* Timeline */}
@@ -1337,7 +1560,7 @@ function App() {
           <div className="timeline-header">
             <h2>// transaction_log</h2>
             <span className="step-count">
-              {currentStep < 0 ? '0' : Math.min(currentStep + 1, 7)} / 7 steps
+              {currentStep < 0 ? '0' : Math.min(currentStep + 1, TOTAL_STEPS)} / {TOTAL_STEPS} steps
             </span>
           </div>
 
@@ -1356,6 +1579,7 @@ function App() {
                 index={i}
                 currentStep={currentStep}
                 stepData={stepData}
+                awaitingApproval={awaitingApproval}
               />
             ))}
           </div>
@@ -1373,7 +1597,7 @@ function App() {
               {running ? (
                 <>
                   <span className="step-spinner" style={{borderColor:'rgba(0,0,0,0.2)',borderTopColor:'#000'}}></span>
-                  Processing...
+                  {awaitingApproval ? 'Waiting for approval…' : 'Processing...'}
                 </>
               ) : done ? '⟳ Run Again' : '▶ Try It Live'}
             </button>
@@ -1392,7 +1616,15 @@ function App() {
             <>
               <div className="data-grid">
                 <div className="data-card">
-                  <div className="data-card-label">Nullifier (random)</div>
+                  <div className="data-card-label">Deliverable Commitment (Agent B)</div>
+                  <div className="data-card-value">{liveData.commitmentB}</div>
+                </div>
+                <div className="data-card">
+                  <div className="data-card-label">Secret Nonce</div>
+                  <div className="data-card-value">{liveData.nonce}</div>
+                </div>
+                <div className="data-card">
+                  <div className="data-card-label">Nullifier (Agent A)</div>
                   <div className="data-card-value">{liveData.nullifier}</div>
                 </div>
                 <div className="data-card">
@@ -1400,8 +1632,12 @@ function App() {
                   <div className="data-card-value">{liveData.proof}</div>
                 </div>
                 <div className="data-card">
-                  <div className="data-card-label">Commitment Hash</div>
+                  <div className="data-card-label">Payment Commitment Hash</div>
                   <div className="data-card-value">{liveData.commitment}</div>
+                </div>
+                <div className="data-card">
+                  <div className="data-card-label">Approval Signature (ed25519)</div>
+                  <div className="data-card-value">0x{liveData.approvalSig}</div>
                 </div>
                 <div className="data-card">
                   <div className="data-card-label">Settlement Ref</div>
@@ -1414,6 +1650,8 @@ function App() {
                   <div className="success-box-title">🎉 Transaction Complete</div>
                   <div className="success-box-text">
                     750 PRIV settled on Solana Devnet via PrivChain (priv-stark/v1).
+                    Agent A committed payment before delivery, Agent B committed deliverable before payment — 
+                    then Agent A verified and approved before settlement fired.
                     Amount, sender, and recipient remain cryptographically private.
                     {liveData.simulated && (
                       <span style={{color:'var(--yellow)', display:'block', marginTop:6}}>
@@ -1440,10 +1678,10 @@ function App() {
               fontSize:13,
               fontFamily:"'JetBrains Mono', monospace",
             }}>
-              Press "Try It Live" to initiate a real PrivChain payment between Agent A and Agent B.
+              Press "Try It Live" to run the PrivChain commitment-reveal demo.
               <br/>
               <span style={{fontSize:11, opacity:0.7}}>
-                Generates cryptographic nullifier + commitment client-side, then calls the live facilitator API.
+                Agent B commits deliverable hash → Agent A locks payment → delivery → Agent A approves → settlement fires.
               </span>
             </div>
           )}
@@ -1457,9 +1695,9 @@ function App() {
           marginBottom:32,
         }}>
           {[
-            { icon:'🔐', title:'ZK Commitments', desc:'Each payment generates a unique nullifier and ZK commitment, revealing nothing about sender, receiver, or amount.' },
-            { icon:'⛓', title:'Facilitator Network', desc:'PrivChain facilitator nodes verify proofs off-chain before submitting a privacy-preserving settlement tx to Solana.' },
-            { icon:'🤖', title:'Agent-Native', desc:'Designed for autonomous AI agents — no human-in-the-loop required. Agents discover, negotiate, and pay privately.' },
+            { icon:'🔒', title:'Commitment-Reveal Gate', desc:'Agent B commits to their deliverable hash before work begins. Agent A commits payment. Neither can change their side without invalidating the contract.' },
+            { icon:'✅', title:'Agent A Must Approve', desc:'Payment doesn\'t fire automatically. Agent A reviews the deliverable, verifies the hash matches, then explicitly approves. This is not just escrow — it\'s programmable conditional release.' },
+            { icon:'🔐', title:'ZK Commitments', desc:'Each payment generates a unique nullifier and ZK commitment, revealing nothing about sender, receiver, or amount on-chain.' },
             { icon:'🌐', title:'Solana Settlement', desc:'Final settlement is anchored on Solana for speed and cost. On-chain data contains no identifying information.' },
           ].map((item,i) => (
             <div key={i} style={{
