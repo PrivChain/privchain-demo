@@ -1209,7 +1209,7 @@ function StepItem({ step, index, currentStep, stepData, awaitingApproval }) {
 // ─────────────────────────────────────────────
 const QA_ITEMS = [
   { q: "Your privacy is fake — Solana is public. I can see every transfer.",
-    a: "PrivChain is relationship-private and intent-private, not amount-private. Your competitors can't map your AI supply chain — they can't see which agents you hire, what you pay for, or who delivers for you. Wallet addresses are pseudonymous; the commitment reveals nothing about the deliverable. Amount privacy is V2 — confidential transfers exist on Solana via ZK compression and are on our roadmap." },
+    a: "PrivChain is relationship-private and intent-private, not amount-private. Your competitors can't map your AI supply chain — they can't see which agents you hire, what you pay for, or who delivers for you. Wallet addresses are pseudonymous; the commitment reveals nothing about the deliverable. Amount privacy is V2 — confidential transfers exist on Solana via ZK compression and are on our roadmap. Additionally, denomination mixing ensures the payment amount never appears as a unique figure on-chain — 750 PRIV becomes two unremarkable round-number transfers of 500 and 250 PRIV, indistinguishable from thousands of routine transfers." },
   { q: "This is just escrow with extra steps. Multisig has existed for 10 years.",
     a: "Multisig requires both parties to know each other and share identity with an escrow agent. PrivChain's commitment-reveal is trustless and pseudonymous: Agent B commits to a hash before starting, Agent A releases a blind approval signature, and the on-chain record shows only a nullifier. No escrow agent. No shared identity. The innovation is escrow-equivalent guarantees with zero relationship disclosure." },
   { q: "Agent A's approval is still a trusted party. This isn't trustless — it's just bilateral.",
@@ -1224,6 +1224,8 @@ const QA_ITEMS = [
     a: "We don't — and we don't need to. PrivChain is an agent payment protocol, not an AI certification authority. Whether the entity behind the key is an LLM or a human is irrelevant to the payment guarantee. What matters: does Agent B have staked collateral? Did they commit to the deliverable hash before starting? Did Agent A release the approval signature? The protocol enforces these guarantees regardless of what sits behind the key." },
   { q: "Are you licensed as a money transmitter? This sounds like a payment processor.",
     a: "PRIV is a utility token used for staking and protocol governance within a closed ecosystem. The facilitator settles between agent wallets on Solana — it's a smart contract settlement layer, not a fiat payment processor. We take the same legal position as every DeFi protocol: this is software. We're monitoring regulatory developments closely." },
+  { q: "You use denomination mixing but I can still correlate the timing of the split transactions.",
+    a: "Correct — timing correlation is a residual attack vector in V1. Mitigations: (1) the pool wallet batches multiple agent settlements together so individual timing is obscured by other traffic; (2) random jitter (1-5s) between sub-transactions breaks precise timestamp matching; (3) V2 adds a time-delay mixing pool where settlements are batched into fixed windows (e.g. every 60 seconds). V1 is honest about this tradeoff." },
 ];
 
 function QnA() {
